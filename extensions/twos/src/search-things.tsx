@@ -1,6 +1,6 @@
-import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Color, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { api, listWebUrl, TwosList, TwosThing } from "./api";
+import { api, listDeepLink, listWebUrl, TwosList, TwosThing } from "./api";
 
 // Search matches the mobile app's behavior (apps/mobile/components/SearchResults.tsx):
 //   - Both lists AND things are shown; lists rank above things.
@@ -22,6 +22,13 @@ type ThingRow = {
 type Row = ListRow | ThingRow;
 
 export default function SearchThings() {
+  // When the user has turned on "Prefer the desktop app" in preferences,
+  // we make the twos:// deep link the PRIMARY action (Enter) and the web
+  // URL the secondary (⌘+Enter). Otherwise the web link stays primary and
+  // the desktop-app link is hidden entirely (no point showing an action
+  // that would trigger a "no app registered for this URL" macOS dialog
+  // for users without the desktop app installed).
+  const { preferDesktopApp } = getPreferenceValues<Preferences.SearchThings>();
   const [query, setQuery] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
@@ -152,7 +159,18 @@ export default function SearchThings() {
               accessories={[{ tag: "List" }]}
               actions={
                 <ActionPanel>
-                  <Action.OpenInBrowser url={listWebUrl(list.id)} title="Open List in Twos" />
+                  {preferDesktopApp ? (
+                    <>
+                      <Action.Open
+                        target={listDeepLink(list.id)}
+                        title="Open List in Twos App"
+                        icon={Icon.AppWindow}
+                      />
+                      <Action.OpenInBrowser url={listWebUrl(list.id)} title="Open List in Browser" />
+                    </>
+                  ) : (
+                    <Action.OpenInBrowser url={listWebUrl(list.id)} title="Open List in Twos" />
+                  )}
                   <Action.CopyToClipboard content={list.title} title="Copy Title" />
                 </ActionPanel>
               }
@@ -180,7 +198,22 @@ export default function SearchThings() {
               ]}
               actions={
                 <ActionPanel>
-                  <Action.OpenInBrowser url={listWebUrl(thing.list_id)} title="Open List in Twos" />
+                  {preferDesktopApp ? (
+                    <>
+                      {/* Passing the thing id as scrollToThing tells the
+                          desktop app to open the parent list AND scroll +
+                          highlight this specific row — a nicer landing
+                          than the web browser can offer. */}
+                      <Action.Open
+                        target={listDeepLink(thing.list_id, thing.id)}
+                        title="Open in Twos App"
+                        icon={Icon.AppWindow}
+                      />
+                      <Action.OpenInBrowser url={listWebUrl(thing.list_id)} title="Open List in Browser" />
+                    </>
+                  ) : (
+                    <Action.OpenInBrowser url={listWebUrl(thing.list_id)} title="Open List in Twos" />
+                  )}
                   {thing.type === "todo" &&
                     (thing.completed ? (
                       <Action title="Mark Incomplete" icon={Icon.Circle} onAction={() => setCompleted(thing, false)} />

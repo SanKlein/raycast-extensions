@@ -20,21 +20,21 @@
     {
       "name": "add-thing",
       "title": "Add Thing",
-      "subtitle": "Twos",
+      "subtitle": "NewTwos",
       "description": "Add a to-do, note, or hyperlink to a list.",
       "mode": "view"
     },
     {
       "name": "search-things",
       "title": "Search Things",
-      "subtitle": "Twos",
+      "subtitle": "NewTwos",
       "description": "Search and browse your things; complete or open them.",
       "mode": "view"
     },
     {
       "name": "create-list",
       "title": "Create List",
-      "subtitle": "Twos",
+      "subtitle": "NewTwos",
       "description": "Create a new list.",
       "mode": "view"
     }
@@ -43,28 +43,34 @@
     {
       "name": "apiKey",
       "title": "API Key",
-      "description": "A Twos API key from Settings → Advanced → API Keys.",
+      "description": "A Twos API key from Settings \u2192 Advanced \u2192 API Keys.",
       "type": "password",
       "required": true
+    },
+    {
+      "name": "preferDesktopApp",
+      "title": "Prefer the desktop app",
+      "label": "Open results in Twos",
+      "description": "Open lists and things in the Twos desktop app instead of the browser. Requires the desktop app from writethingsdown.com/download.",
+      "type": "checkbox",
+      "required": false,
+      "default": false
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.104.19"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^2.0.4",
-    "@types/node": "22.13.10",
-    "@types/react": "19.0.10",
-    "eslint": "^9.22.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "@raycast/eslint-config": "^2.1.1",
+    "@types/node": "^22.19.17",
+    "@types/react": "^19.0.10",
+    "eslint": "^10.4.1",
+    "typescript": "^5.4.5"
   },
   "scripts": {
     "build": "ray build -e dist",
     "dev": "ray develop",
-    "fix-lint": "ray lint --fix",
     "lint": "ray lint",
-    "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
-    "publish": "npx @raycast/api@latest publish"
+    "publish": "ray publish"
   }
 }
